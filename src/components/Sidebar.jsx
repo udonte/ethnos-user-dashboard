@@ -23,7 +23,7 @@ const Sidebar = () => {
     <aside
       className={`relative placeholder:top-0 left-0 z-30 h-screen bg-white text-white p-4  ${
         isCollapsed ? "w-16" : "w-60"
-      } transition-all duration-300`}
+      } transition-all duration-600`}
     >
       {/* Collapse/Expand Button */}
       <button
@@ -48,7 +48,7 @@ const Sidebar = () => {
         <ul>
           <li className="mb-12">
             <NavLink
-              className={`text-ethnos-blue-300 font-manrope  flex items-center space-x-2    ${
+              className={`text-ethnos-blue-600 font-manrope  flex items-center space-x-2    ${
                 isCollapsed ? "w-fit" : " w-full"
               }`}
             >
@@ -66,10 +66,10 @@ const Sidebar = () => {
                 <NavLink
                   to={link.path}
                   className={({ isActive }) =>
-                    `flex items-center space-x-2  hover:bg-ethnos-blue-300 hover:text-white p-2 rounded ${
+                    `flex items-center space-x-2  hover:bg-ethnos-blue-600 hover:text-white p-2 rounded ${
                       isActive
-                        ? "bg-ethnos-blue-300 text-white font-bold"
-                        : " text-ethnos-blue-300 bg-white"
+                        ? "bg-ethnos-blue-600 text-white font-bold"
+                        : " text-ethnos-blue-600 bg-white"
                     }
                        ${isCollapsed ? "w-fit" : " w-full"}`
                   }

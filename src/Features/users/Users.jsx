@@ -1,16 +1,27 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import CustomInput from "../../components/CustomInput";
-import { TbFlagSearch, TbUserSearch } from "react-icons/tb";
+import { TbUserSearch } from "react-icons/tb";
 import DeleteUser from "./modals/DeleteUser";
 import ViewUserDetails from "./modals/ViewUserDetails";
 import { MdMoreVert } from "react-icons/md";
+import {
+  FaSortAlphaDown,
+  FaSortAlphaUp,
+  FaSortNumericDownAlt,
+  FaSortNumericUpAlt,
+} from "react-icons/fa";
 
 const Users = () => {
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
+  const [searchTerm, setSearchTerm] = useState(""); // State for search
+  const [currentPage, setCurrentPage] = useState(1); // State for pagination
+  const [usersPerPage] = useState(10); // Users per page
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: null }); // State for sorting
+
   const dispatch = useDispatch();
-  const { users, mockUsers, loading } = useSelector((state) => state.users);
+  const { mockUsers, loading } = useSelector((state) => state.users);
 
   // DETAILS MODAL
   const [detailsModalOpen, setDetailsModalOpen] = useState(false);
@@ -25,9 +36,63 @@ const Users = () => {
     setCurrentUser(user);
   };
 
-  // useEffect(() => {
-  //   dispatch(fetchUsers());
-  // }, []);
+  // Search users by name, email, company, or city
+  const filteredUsers = useMemo(() => {
+    return mockUsers.filter(
+      (user) =>
+        user?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user?.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user?.company.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user?.address.city.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [mockUsers, searchTerm]);
+
+  // Helper function to get nested values
+  const getNestedValue = (obj, key) => {
+    if (key === "company") return obj.company.name;
+    if (key === "city") return obj.address.city;
+    return obj[key];
+  };
+
+  // Sorting logic for nested fields
+  const sortedUsers = useMemo(() => {
+    if (sortConfig.key !== null) {
+      return [...filteredUsers].sort((a, b) => {
+        const aValue = getNestedValue(a, sortConfig.key);
+        const bValue = getNestedValue(b, sortConfig.key);
+
+        if (aValue < bValue) {
+          return sortConfig.direction === "asc" ? -1 : 1;
+        }
+        if (aValue > bValue) {
+          return sortConfig.direction === "asc" ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+    return filteredUsers;
+  }, [filteredUsers, sortConfig]);
+
+  // Pagination logic
+  const indexOfLastUser = currentPage * usersPerPage;
+  const indexOfFirstUser = indexOfLastUser - usersPerPage;
+  const currentUsers = sortedUsers.slice(indexOfFirstUser, indexOfLastUser);
+
+  const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
+
+  const paginate = (pageNumber) => {
+    if (pageNumber >= 1 && pageNumber <= totalPages) {
+      setCurrentPage(pageNumber);
+    }
+  };
+
+  const handleSort = (key) => {
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
+    }
+    setSortConfig({ key, direction });
+  };
 
   if (loading) {
     return (
@@ -38,51 +103,126 @@ const Users = () => {
   }
 
   return (
-    <div className="text-ethnos-blue-600">
+    <div className="text-ethnos-blue-600 bg-white rounded-2xl py-4 px-8">
       <div className="flex items-start justify-between mb-12">
         <p className="text-3xl font-bold font-montserratAlternates">
           {`${mockUsers?.length} Users`}
         </p>
 
-        <div className="w-[30%] ">
-          <div className=" ">
-            <div className="w-full relative">
-              <CustomInput
-                size={"small"}
-                placeholder={"Search users"}
-                inputClassName={`rounded-xl px-4 py-2 pr-4 text-sm text-ethnos-blue-600`}
-              />
-              <div className="absolute top-2 right-4 text-gray-500 font-thin">
-                <TbUserSearch />
-              </div>
+        <div className="w-[40%]">
+          <div className="w-full relative">
+            <CustomInput
+              size={"small"}
+              placeholder={
+                "Search by name, email, company or city | Click headers to sort"
+              }
+              inputClassName={`rounded-xl px-4 py-2 pr-6 text-sm text-ethnos-blue-600`}
+              value={searchTerm}
+              handleInputChange={(e) => setSearchTerm(e.target.value)}
+            />
+            <div className="absolute top-2 right-4 text-gray-500 font-thin">
+              <TbUserSearch />
             </div>
           </div>
         </div>
       </div>
+
       {mockUsers.length > 0 ? (
         <div className="">
-          <table className="min-w-full rounded-2xl border shadow">
+          <table className="min-w-full rounded-2xl border shadow-md overflow-hidden">
             <thead className="bg-ethnos-blue-600 text-white rounded-2xl">
               <tr>
-                <th className="py-3 px-4 border-b text-left font-medium">ID</th>
-                <th className="py-3 px-4 border-b text-left font-medium">
-                  Name
+                <th
+                  className="py-3 px-4 text-left font-medium"
+                  onClick={() => handleSort("id")}
+                >
+                  <span className="inline-flex items-center gap-1 cursor-pointer">
+                    ID
+                    {sortConfig.key === "id" ? (
+                      sortConfig.direction === "asc" ? (
+                        <FaSortNumericUpAlt />
+                      ) : (
+                        <FaSortNumericDownAlt />
+                      )
+                    ) : (
+                      ""
+                    )}
+                  </span>
+                </th>
+                <th
+                  className="py-3 px-4 text-left font-medium "
+                  onClick={() => handleSort("name")} // Sort by name
+                >
+                  <span className="inline-flex items-center gap-1 cursor-pointer">
+                    Name
+                    {sortConfig.key === "name" ? (
+                      sortConfig.direction === "asc" ? (
+                        <FaSortAlphaUp />
+                      ) : (
+                        <FaSortAlphaDown />
+                      )
+                    ) : (
+                      ""
+                    )}
+                  </span>
                 </th>
 
-                <th className="py-3 px-4 border-b text-left font-medium hidden md:table-cell">
-                  Email
+                <th
+                  className="py-3 px-4 text-left font-medium hidden md:table-cell "
+                  onClick={() => handleSort("email")} // Sort by email
+                >
+                  <span className="inline-flex items-center gap-1 cursor-pointer">
+                    Email{" "}
+                    {sortConfig.key === "email" ? (
+                      sortConfig.direction === "asc" ? (
+                        <FaSortAlphaUp />
+                      ) : (
+                        <FaSortAlphaDown />
+                      )
+                    ) : (
+                      ""
+                    )}
+                  </span>
                 </th>
-                <th className="py-3 px-4 border-b text-left font-medium hidden lg:table-cell">
-                  City
+                <th
+                  className="py-3 px-4 text-left font-medium hidden lg:table-cell "
+                  onClick={() => handleSort("city")} // Sort by city
+                >
+                  <span className="inline-flex items-center gap-1 cursor-pointer">
+                    City {""}
+                    {sortConfig.key === "city" ? (
+                      sortConfig.direction === "asc" ? (
+                        <FaSortAlphaUp />
+                      ) : (
+                        <FaSortAlphaDown />
+                      )
+                    ) : (
+                      ""
+                    )}
+                  </span>
                 </th>
-                <th className="py-3 px-4 border-b text-left font-medium">
-                  Company
+                <th
+                  className="py-3 px-4 text-left font-medium cursor-pointer"
+                  onClick={() => handleSort("company")} // Sort by company
+                >
+                  <span className="inline-flex items-center gap-1 cursor-pointer">
+                    Company{" "}
+                    {sortConfig.key === "company" ? (
+                      sortConfig.direction === "asc" ? (
+                        <FaSortAlphaUp />
+                      ) : (
+                        <FaSortAlphaDown />
+                      )
+                    ) : (
+                      ""
+                    )}
+                  </span>
                 </th>
-                <th className="py-3 px-4 border-b text-left font-medium"></th>
+                <th className="py-3 px-4 text-left font-medium"></th>
               </tr>
             </thead>
             <tbody className="bg-white">
-              {mockUsers.map((user) => (
+              {currentUsers.map((user) => (
                 <tr key={user.id} className="text-sm relative">
                   <td className="py-3 px-4 border-b">{user.id}</td>
                   <td className="py-3 px-4 border-b">{user.name}</td>
@@ -93,7 +233,7 @@ const Users = () => {
                   <td className="py-3 px-4 border-b hidden lg:table-cell">
                     {user.company.name}
                   </td>
-                  <td className="py-3 px-4 border-b text-center ">
+                  <td className="py-3 px-4 border-b text-center">
                     <MdMoreVert
                       size={20}
                       className="cursor-pointer"
@@ -128,10 +268,44 @@ const Users = () => {
               ))}
             </tbody>
           </table>
+
+          {/* Pagination */}
+          <div className="flex justify-between mt-16">
+            <button
+              onClick={() => paginate(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="px-4 py-2 mx-1 text-white bg-gray-500 rounded-md"
+            >
+              Prev
+            </button>
+            {[...Array(totalPages)].map((_, index) => (
+              <button
+                key={index}
+                onClick={() => paginate(index + 1)}
+                className={`px-4 py-2 mx-1 text-white ${
+                  currentPage === index + 1
+                    ? "bg-ethnos-blue-600"
+                    : "bg-gray-500"
+                } rounded-md`}
+              >
+                {index + 1}
+              </button>
+            ))}
+            <button
+              onClick={() => paginate(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="px-4 py-2 mx-1 text-white bg-gray-500 rounded-md"
+            >
+              Next
+            </button>
+          </div>
         </div>
       ) : (
-        <div>No data</div>
+        <div className="text-center mt-10">
+          <p>No users found</p>
+        </div>
       )}
+
       <DeleteUser
         user={currentUser}
         isOpen={deleteModalOpen}
