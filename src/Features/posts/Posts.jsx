@@ -85,7 +85,7 @@ const Posts = () => {
 
       {mockPosts.length > 0 ? (
         <div>
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-2 space-y-2 rounded-2xl shadow-md p-2 md:p-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-2 space-y-2 rounded-2xl p-2 md:p-4">
             <>
               {currentPosts.map((post) => (
                 <div
