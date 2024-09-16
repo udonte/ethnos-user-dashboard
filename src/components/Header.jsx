@@ -5,9 +5,9 @@ import placeholderImage from "../assets/adeola.png";
 
 const Header = () => {
   return (
-    <div className="bg-ethnos-blue-600 flex items-center justify-between py-4 px-4">
+    <div className="bg-ethnos-blue-600 flex items-center gap-4 justify-between py-4 px-4">
       {/* search */}
-      <div className="w-[30%] ">
+      <div className="w-full lg:w-[30%] ">
         <div className=" ">
           <div className="w-full relative">
             <CustomInput

@@ -13,7 +13,7 @@ const Layout = () => {
       <div className="flex flex-col flex-1">
         <Header />
         <main
-          className="flex-1 p-5 bg-ethnos-gray-200 overflow-y-scroll  "
+          className="flex-1 p-2 md:p-5 bg-ethnos-gray-200 overflow-y-scroll  "
           style={{
             scrollbarWidth: "none" /* For Firefox */,
             WebkitScrollbarWidth: "none" /* For WebKit-based browsers */,

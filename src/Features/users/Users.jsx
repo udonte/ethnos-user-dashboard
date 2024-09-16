@@ -21,7 +21,7 @@ const Users = () => {
   const [sortConfig, setSortConfig] = useState({ key: null, direction: null }); // State for sorting
 
   const dispatch = useDispatch();
-  const { mockUsers, loading } = useSelector((state) => state.users);
+  const { mockUsers, users, loading } = useSelector((state) => state.users);
 
   // DETAILS MODAL
   const [detailsModalOpen, setDetailsModalOpen] = useState(false);
@@ -103,13 +103,13 @@ const Users = () => {
   }
 
   return (
-    <div className="text-ethnos-blue-600 bg-white rounded-2xl py-4 px-8">
-      <div className="flex items-start justify-between mb-12">
-        <p className="text-3xl font-bold font-montserratAlternates">
+    <div className="text-ethnos-blue-600 bg-white rounded-2xl py-4 px-4 md:px-8">
+      <div className="flex flex-col md:flex-row items-center gap-2 justify-between mb-12">
+        <p className="text-xl lg:text-3xl font-bold font-montserratAlternates">
           {`${mockUsers?.length} Users`}
         </p>
 
-        <div className="w-[40%]">
+        <div className="w-full lg:w-[40%] flex-1">
           <div className="w-full relative">
             <CustomInput
               size={"small"}
@@ -169,7 +169,7 @@ const Users = () => {
 
                 <th
                   className="py-3 px-4 text-left font-medium hidden md:table-cell "
-                  onClick={() => handleSort("email")} // Sort by email
+                  onClick={() => handleSort("email")}
                 >
                   <span className="inline-flex items-center gap-1 cursor-pointer">
                     Email{" "}
@@ -186,7 +186,7 @@ const Users = () => {
                 </th>
                 <th
                   className="py-3 px-4 text-left font-medium hidden lg:table-cell "
-                  onClick={() => handleSort("city")} // Sort by city
+                  onClick={() => handleSort("city")}
                 >
                   <span className="inline-flex items-center gap-1 cursor-pointer">
                     City {""}
@@ -202,7 +202,7 @@ const Users = () => {
                   </span>
                 </th>
                 <th
-                  className="py-3 px-4 text-left font-medium cursor-pointer"
+                  className="py-3 px-4 text-left font-medium cursor-pointer hidden lg:table-cell"
                   onClick={() => handleSort("company")} // Sort by company
                 >
                   <span className="inline-flex items-center gap-1 cursor-pointer">
@@ -226,8 +226,10 @@ const Users = () => {
                 <tr key={user.id} className="text-sm relative">
                   <td className="py-3 px-4 border-b">{user.id}</td>
                   <td className="py-3 px-4 border-b">{user.name}</td>
-                  <td className="py-3 px-4 border-b">{user.email}</td>
                   <td className="py-3 px-4 border-b hidden md:table-cell">
+                    {user.email}
+                  </td>
+                  <td className="py-3 px-4 border-b hidden lg:table-cell">
                     {user.address.city}
                   </td>
                   <td className="py-3 px-4 border-b hidden lg:table-cell">
@@ -270,7 +272,7 @@ const Users = () => {
           </table>
 
           {/* Pagination */}
-          <div className="flex justify-between mt-16">
+          <div className="flex justify-center lg:justify-between mt-16">
             <button
               onClick={() => paginate(currentPage - 1)}
               disabled={currentPage === 1}
@@ -282,7 +284,7 @@ const Users = () => {
               <button
                 key={index}
                 onClick={() => paginate(index + 1)}
-                className={`px-4 py-2 mx-1 text-white ${
+                className={`px-4 py-2 mx-1 text-white hidden lg:block ${
                   currentPage === index + 1
                     ? "bg-ethnos-blue-600"
                     : "bg-gray-500"

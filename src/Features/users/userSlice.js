@@ -3,9 +3,7 @@ import axios from "axios";
 import { mockUsers } from "../../data/mock";
 
 export const fetchUsers = createAsyncThunk("users/fetchUsers", async () => {
-  const apiResponse = await axios.get(
-    "https://jsonplaceholder.typicode.com/users"
-  );
+  const apiResponse = await fetch("https://jsonplaceholder.typicode.com/users");
   const result = await apiResponse.json();
   console.log(result);
   return result;
