@@ -6,9 +6,7 @@ import AppRoutes from "./routes/AppRoutes";
 const App = () => {
   return (
     <Provider store={store}>
-      <Router>
-        <AppRoutes />
-      </Router>
+      <AppRoutes />
     </Provider>
   );
 };
