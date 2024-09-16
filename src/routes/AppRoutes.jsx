@@ -1,11 +1,11 @@
 import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Layout from "../components/Layout";
-import Users from "../Features/users/users";
 import Posts from "../Features/posts/Posts";
 import Todos from "../Features/todos/Todos";
 import Albums from "../Features/albums/Albums";
 import Settings from "../Features/settings/Settings";
+import Users from "../Features/users/Users";
 
 const AppRoutes = () => {
   return (
