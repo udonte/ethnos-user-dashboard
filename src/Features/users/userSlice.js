@@ -1,5 +1,4 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
 import { mockUsers } from "../../data/mock";
 
 export const fetchUsers = createAsyncThunk("users/fetchUsers", async () => {

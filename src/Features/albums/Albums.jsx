@@ -1,12 +1,12 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import CustomInput from "../../components/CustomInput";
 
 import { LuFileSearch } from "react-icons/lu";
 import { BiPhotoAlbum } from "react-icons/bi";
+import { fetchAlbums } from "./albums.slice";
 
 const Albums = () => {
-  const [activeDropdown, setActiveDropdown] = useState(null);
   const [searchTerm, setSearchTerm] = useState(""); // State for search
   const [currentPage, setCurrentPage] = useState(1); // State for pagination
   const [albumsPerPage] = useState(10); // Albums per page
@@ -14,19 +14,12 @@ const Albums = () => {
   const dispatch = useDispatch();
   const { mockAlbums, albums, loading } = useSelector((state) => state.albums);
 
-  console.log(albums);
-
-  const handleDropdown = (id, album) => {
-    setActiveDropdown(activeDropdown === id ? null : id);
-    setCurrentAlbum(album);
-  };
-
   // Search albums by name, email, company, or city
   const filteredAlbums = useMemo(() => {
-    return albums.filter((album) =>
+    return albums?.filter((album) =>
       album?.title.toLowerCase().includes(searchTerm.toLowerCase())
     );
-  }, [mockAlbums, searchTerm]);
+  }, [albums, searchTerm]);
 
   // Pagination logic
   const indexOfLastAlbum = currentPage * albumsPerPage;
@@ -44,6 +37,10 @@ const Albums = () => {
     }
   };
 
+  useEffect(() => {
+    dispatch(fetchAlbums());
+  }, []);
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -56,7 +53,7 @@ const Albums = () => {
     <div className="text-ethnos-blue-600 bg-white rounded-2xl py-4 px-4 md:px-8">
       <div className="flex flex-col md:flex-row items-start justify-between mb-12">
         <p className="text-3xl font-bold font-montserratAlternates">
-          {`${mockAlbums?.length} Albums`}
+          {`${albums?.length} Albums`}
         </p>
 
         <div className="w-full md:w-[40%]">
