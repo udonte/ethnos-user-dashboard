@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import CustomInput from "../../components/CustomInput";
 import { TbUserSearch } from "react-icons/tb";
@@ -11,24 +11,23 @@ import {
   FaSortNumericDownAlt,
   FaSortNumericUpAlt,
 } from "react-icons/fa";
+import { fetchUsers } from "./userSlice";
 
 const Users = () => {
-  const [activeDropdown, setActiveDropdown] = useState(null);
+  const [activeDropdown, setActiveDropdown] = useState();
   const [currentUser, setCurrentUser] = useState(null);
   const [searchTerm, setSearchTerm] = useState(""); // State for search
   const [currentPage, setCurrentPage] = useState(1); // State for pagination
   const [usersPerPage] = useState(10); // Users per page
   const [sortConfig, setSortConfig] = useState({ key: null, direction: null }); // State for sorting
+  const [detailsModalOpen, setDetailsModalOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
   const dispatch = useDispatch();
-  const { mockUsers, users, loading } = useSelector((state) => state.users);
+  const { users, loading } = useSelector((state) => state.users);
 
-  // DETAILS MODAL
-  const [detailsModalOpen, setDetailsModalOpen] = useState(false);
+  // Handerls
   const closeDetailsModal = () => setDetailsModalOpen((prev) => !prev);
-
-  // DELETE MODAL
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const closeDeleteModal = () => setDeleteModalOpen((prev) => !prev);
 
   const handleDropdown = (id, user) => {
@@ -38,14 +37,14 @@ const Users = () => {
 
   // Search users by name, email, company, or city
   const filteredUsers = useMemo(() => {
-    return mockUsers.filter(
+    return users?.filter(
       (user) =>
         user?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         user?.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
         user?.company.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         user?.address.city.toLowerCase().includes(searchTerm.toLowerCase())
     );
-  }, [mockUsers, searchTerm]);
+  }, [users, searchTerm]);
 
   // Helper function to get nested values
   const getNestedValue = (obj, key) => {
@@ -94,6 +93,10 @@ const Users = () => {
     setSortConfig({ key, direction });
   };
 
+  useEffect(() => {
+    dispatch(fetchUsers());
+  }, []);
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -106,17 +109,17 @@ const Users = () => {
     <div className="text-ethnos-blue-600 bg-white rounded-2xl py-4 px-4 md:px-8">
       <div className="flex flex-col md:flex-row items-center gap-2 justify-between mb-12">
         <p className="text-xl lg:text-3xl font-bold font-montserratAlternates">
-          {`${mockUsers?.length} Users`}
+          {`${users?.length} Users`}
         </p>
 
-        <div className="w-full lg:w-[40%] flex-1">
+        <div className="w-full lg:w-[40%]">
           <div className="w-full relative">
             <CustomInput
               size={"small"}
               placeholder={
                 "Search by name, email, company or city | Click headers to sort"
               }
-              inputClassName={`rounded-xl px-4 py-2 pr-6 text-sm text-ethnos-blue-600`}
+              inputClassName={`rounded-xl px-4 py-2 pr-8 text-sm text-ethnos-blue-600`}
               value={searchTerm}
               handleInputChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -127,7 +130,7 @@ const Users = () => {
         </div>
       </div>
 
-      {mockUsers.length > 0 ? (
+      {users.length > 0 ? (
         <div className="">
           <table className="min-w-full rounded-2xl border shadow-md overflow-hidden">
             <thead className="bg-ethnos-blue-600 text-white rounded-2xl">

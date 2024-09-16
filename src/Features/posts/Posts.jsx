@@ -72,7 +72,7 @@ const Posts = () => {
             <CustomInput
               size={"small"}
               placeholder={"Search by posts by title"}
-              inputClassName={`rounded-xl px-4 py-2 pr-6 text-sm text-ethnos-blue-600`}
+              inputClassName={`rounded-xl px-4 py-2 pr-8 text-sm text-ethnos-blue-600`}
               value={searchTerm}
               handleInputChange={(e) => setSearchTerm(e.target.value)}
             />

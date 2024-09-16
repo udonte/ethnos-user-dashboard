@@ -5,7 +5,6 @@ import { mockUsers } from "../../data/mock";
 export const fetchUsers = createAsyncThunk("users/fetchUsers", async () => {
   const apiResponse = await fetch("https://jsonplaceholder.typicode.com/users");
   const result = await apiResponse.json();
-  console.log(result);
   return result;
 });
 
@@ -27,13 +26,10 @@ const userReducer = createSlice({
 
     builder.addCase(fetchUsers.fulfilled, (state, action) => {
       (state.loading = false), (state.users = action.payload);
-      console.console.log(action.payload);
-      console.console.log(state.users);
     });
 
     builder.addCase(fetchUsers.rejected, (state, action) => {
       (state.loading = false), (state.isError = true);
-      console.log(state.users);
     });
   },
 });
