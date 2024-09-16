@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import CustomInput from "../../components/CustomInput";
 import DeletePost from "./modals/DeletePost";
@@ -6,6 +6,7 @@ import ViewPostDetails from "./modals/ViewPostDetails";
 import { MdMoreVert } from "react-icons/md";
 import { LuFileSearch } from "react-icons/lu";
 import { BsPostcard } from "react-icons/bs";
+import { fetchPosts } from "./postsSlice";
 
 const Posts = () => {
   const [activeDropdown, setActiveDropdown] = useState(null);
@@ -16,8 +17,6 @@ const Posts = () => {
 
   const dispatch = useDispatch();
   const { mockPosts, posts, loading } = useSelector((state) => state.posts);
-
-  console.log(posts);
 
   // DETAILS MODAL
   const [detailsModalOpen, setDetailsModalOpen] = useState(false);
@@ -34,10 +33,10 @@ const Posts = () => {
 
   // Search posts by name, email, company, or city
   const filteredPosts = useMemo(() => {
-    return mockPosts.filter((post) =>
+    return posts?.filter((post) =>
       post?.title.toLowerCase().includes(searchTerm.toLowerCase())
     );
-  }, [mockPosts, searchTerm]);
+  }, [posts, searchTerm]);
 
   // Pagination logic
   const indexOfLastPost = currentPage * postsPerPage;
@@ -52,6 +51,10 @@ const Posts = () => {
     }
   };
 
+  useEffect(() => {
+    dispatch(fetchPosts());
+  }, []);
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -64,7 +67,7 @@ const Posts = () => {
     <div className="text-ethnos-blue-600 bg-white rounded-2xl py-4 px-4 md:px-8">
       <div className="flex flex-col md:flex-row items-start justify-between mb-12">
         <p className="text-3xl font-bold font-montserratAlternates">
-          {`${mockPosts?.length} Posts`}
+          {`${posts?.length} Posts`}
         </p>
 
         <div className="w-full md:w-[40%]">

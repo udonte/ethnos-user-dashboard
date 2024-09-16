@@ -2,10 +2,8 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { mockPosts } from "../../data/mock";
 
-export const fetchPosts = createAsyncThunk("users/fetchPosts", async () => {
-  const apiResponse = await axios.get(
-    "https://jsonplaceholder.typicode.com/posts"
-  );
+export const fetchPosts = createAsyncThunk("posts/fetchPosts", async () => {
+  const apiResponse = await fetch("https://jsonplaceholder.typicode.com/posts");
   const result = await apiResponse.json();
   console.log(result);
   return result;
@@ -29,13 +27,10 @@ const postReducer = createSlice({
 
     builder.addCase(fetchPosts.fulfilled, (state, action) => {
       (state.loading = false), (state.posts = action.payload);
-      console.console.log(action.payload);
-      console.console.log(state.posts);
     });
 
     builder.addCase(fetchPosts.rejected, (state, action) => {
       (state.loading = false), (state.isError = true);
-      console.log(state.posts);
     });
   },
 });

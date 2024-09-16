@@ -1,10 +1,11 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import CustomInput from "../../components/CustomInput";
 import CustomRadioButton from "../../components/CustomRadioButton"; // Assuming you have this component
 
 import { LuFileSearch } from "react-icons/lu";
 import { RiTodoLine } from "react-icons/ri";
+import { fetchTodos } from "./todosSlice";
 
 const Todos = () => {
   const [searchTerm, setSearchTerm] = useState(""); // State for search
@@ -17,7 +18,7 @@ const Todos = () => {
 
   // Search and filter todos by title and completion status
   const filteredTodos = useMemo(() => {
-    return mockTodos
+    return todos
       .filter((todo) =>
         todo?.title.toLowerCase().includes(searchTerm.toLowerCase())
       ) // Search filter
@@ -26,7 +27,7 @@ const Todos = () => {
         if (filter === "notCompleted") return !todo.completed;
         return true; // No filter or 'all' selected
       });
-  }, [mockTodos, searchTerm, filter]);
+  }, [todos, searchTerm, filter]);
 
   // Pagination logic
   const indexOfLastTodo = currentPage * todosPerPage;
@@ -45,6 +46,10 @@ const Todos = () => {
     setCurrentPage(1); // Reset to first page after filter change
   };
 
+  useEffect(() => {
+    dispatch(fetchTodos());
+  }, []);
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -57,7 +62,7 @@ const Todos = () => {
     <div className="text-ethnos-blue-600 bg-white rounded-2xl py-4 px-4 md:px-8">
       <div className="flex flex-col md:flex-row items-start justify-between mb-12">
         <p className="text-3xl font-bold font-montserratAlternates">
-          {`${mockTodos?.length} Todos`}
+          {`${todos?.length} Todos`}
         </p>
 
         <div className="w-full md:w-[40%]">
@@ -78,7 +83,7 @@ const Todos = () => {
             <div className="font-bold text-xl">Filter Todos</div>
           </div>
           <div className="py-6 ">
-            <div className="flex flex-col md:flex-row md:items-start gap-2 ">
+            <div className="flex flex-col md:flex-row md:gap-4 md:items-start gap-2 ">
               <CustomRadioButton
                 id="all"
                 name="status"
